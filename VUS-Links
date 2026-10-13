@@ -1,0 +1,12 @@
+# VUS links.  [Name] starts a dropdown, then one link per line. That's it.
+# Lines starting with # are notes. Groups with no links stay hidden.
+# Want a custom label?  My Label | https://link.com
+
+[CodePen]
+https://google.com
+google.com/search?q=two
+http://google.com/search?q=three
+Pretty name | https://google.com/search?q=four
+https://google.com/search?q=five
+
+[Canva]
