@@ -279,9 +279,9 @@ const VUS_MIRRORS = ["", "", ""];
 const ICH_MIRRORS = ["", "", ""];
 
 /* Link dropdowns live in their own plain text files, one per site, so each person only edits their own.
-   Use a file name next to this page, or a full URL (e.g. a raw.githubusercontent.com link from your own repo). */
-const VUS_LINKS_FILE = "links-vus.txt";
-const ICH_LINKS_FILE = "links-ich.txt";
+   These point at the shared repo; edit VUS-Links or ICH-Links there (GitHub can take a few minutes to refresh). */
+const VUS_LINKS_FILE = "https://raw.githubusercontent.com/v-x-i/x/refs/heads/main/VUS-Links";
+const ICH_LINKS_FILE = "https://raw.githubusercontent.com/v-x-i/x/refs/heads/main/ICH-Links";
 
 /* ---- Seasonal theme: time of day + season, with big decorations ---- */
 /* Force a season by typing its name: "halloween", "spring", "summer", "autumn" or "winter". Leave "" for automatic (by month). */
@@ -604,10 +604,8 @@ async function loadLinks(hostId, file) {
     if (!r.ok) throw new Error("HTTP " + r.status);
     groups = parseLinks(await r.text());
   } catch (err) {
-    const t = document.createElement("h3"); t.textContent = "Links";
-    const n = document.createElement("div"); n.className = "sub";
-    n.textContent = "Couldn't load " + file + " (" + err.message + "). Links need the page to be hosted, not opened as a local file.";
-    host.append(t, n);
+    console.warn("Links not loaded:", file, err.message);   /* silent on the page; details only in the console */
+    host.remove();
     return;
   }
   if (!groups.length) { host.remove(); return; }
