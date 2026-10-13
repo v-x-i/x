@@ -206,7 +206,7 @@ button:active{transform:translateY(0) scale(.98)}
 <button class="fx-switch" id="fxToggle" type="button" role="switch" aria-checked="true" title="Seasonal theme"><span id="fxIcon">🎃</span><b id="fxLabel">Seasonal</b><em class="sw"><i></i></em></button>
 <main>
 <header>
-  <img class="brand" id="brand-logo" alt="VUS x ICH logo" src="https://raw.githubusercontent.com/v-x-i/x/refs/heads/main/Logo.jpg">
+  <img class="brand" id="brand-logo" alt="VUS x ICH logo" src="https://raw.githubusercontent.com/v-x-i/x/refs/heads/main/Logo.png">
   <div class="eyebrow">Main Site for All Launchers</div>
   <h1>VUS x ICH Launcher</h1>
 </header>
@@ -686,9 +686,9 @@ function setLogo(imgId, fallbackId, candidates) {
   img.src = candidates[index];
 }
 setLogo("brand-logo", null, [
-  "https://raw.githubusercontent.com/v-x-i/x/refs/heads/main/Logo.jpg",
-  "https://raw.githubusercontent.com/v-x-i/x/main/Logo.jpg",
-  "https://github.com/v-x-i/x/raw/main/Logo.jpg"
+  "https://raw.githubusercontent.com/v-x-i/x/refs/heads/main/Logo.png",
+  "https://raw.githubusercontent.com/v-x-i/x/main/Logo.png",
+  "https://github.com/v-x-i/x/raw/main/Logo.png"
 ]);
 document.querySelector("#vus-card .actions .primary").addEventListener("click", () => chooseMode(VUS_URL, "VUS", false));
 document.querySelector("#ich-card .actions .primary").addEventListener("click", () => chooseMode(ICH_URL, "ICH", true));
