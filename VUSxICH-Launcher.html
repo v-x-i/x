@@ -252,8 +252,8 @@ button:active{transform:translateY(0) scale(.98)}
       <span class="mode-tag">Recommended</span>
       <div class="pv"><div class="pv-tabs"><span>Launcher</span><span class="on">about:blank</span></div><div class="pv-bar"><i></i><i></i><i></i><em></em></div><div class="pv-body"><div class="sb"></div><div class="ct"><s></s><s></s><s></s></div></div></div>
       <h3>New tab</h3>
-      <p>Opens the site in a separate tab so this launcher stays open.</p>
-      <div class="mode-pts"><span>New tab</span><span>Popups needed</span></div>
+      <p>Opens in a separate tab. Quizlet shows behind it, and the site loads on top after 6 seconds.</p>
+      <div class="mode-pts"><span>New tab</span><span>6s delay</span><span>Popups needed</span></div>
     </button>
   </div>
   <div class="mode-status" id="modeStatus" role="status" aria-live="polite"><span class="spin"></span><span id="modeStatusTxt">Loading…</span></div>
@@ -266,6 +266,10 @@ button:active{transform:translateY(0) scale(.98)}
 <script>
 const VUS_URL = "https://raw.githubusercontent.com/Cra-Z-Gaming/VUS/main/index.html";
 const ITSUKI_URL = "https://raw.githubusercontent.com/AniItsukiCoded/backups/refs/heads/main/%28USE%29%20-%20Launcher%20Loader.html";
+
+/* New-tab cover: this page shows behind the site, which loads on top after the delay (milliseconds). */
+const COVER_URL = "https://quizlet.com";
+const NEW_TAB_DELAY = 6000;
 
 /* Add mirror URLs between the quotes below. Leave an entry as "" to hide it. */
 const VUS_MIRRORS = ["", "", ""];
@@ -540,9 +544,10 @@ async function launch(url, mode) {
   if (mode === "new") {
     closeModal();
     target.document.open();
-    target.document.write('<!doctype html><title>Loading…</title><body style="margin:0;background:#0b1020;color:#9aa9c2;font:16px system-ui;display:flex;align-items:center;justify-content:center;height:100vh">Loading…</body>');
+    target.document.write('<!doctype html><title>Quizlet</title><body style="margin:0;background:#fff;overflow:hidden"><iframe src="' + COVER_URL + '" style="position:fixed;inset:0;width:100%;height:100%;border:0;background:#fff"></iframe></body>');
     target.document.close();
   }
+  const started = Date.now();
   if (mode === "same") setStatus("load", "Loading site from GitHub…");
   try {
     const response = await fetch(url, {cache:"no-store"});
@@ -550,6 +555,7 @@ async function launch(url, mode) {
     const html = await response.text();
     if (!/<html[\s>]/i.test(html)) throw new Error("The response does not look like an HTML page.");
     if (mode === "new") {
+      await new Promise(r => setTimeout(r, Math.max(0, NEW_TAB_DELAY - (Date.now() - started))));
       if (target.closed) return;
       const f = target.document.createElement("iframe");
       f.setAttribute("allow", "fullscreen; clipboard-read; clipboard-write; autoplay; microphone; camera; geolocation; encrypted-media; picture-in-picture");
