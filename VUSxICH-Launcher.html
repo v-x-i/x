@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#060b18">
-<title>VUS x Itsuki Launcher</title>
+<title>VUS x ICH Launcher</title>
 <style>
-/* Dark UI everywhere. Left = VUS (blue/green), right = Itsuki (seasonal). Time of day only changes glow strength. */
+/* Dark UI everywhere. Left = VUS (blue/green), right = ICH (seasonal). Time of day only changes glow strength. */
 :root{
   color-scheme:dark;
   --bg1:#060b18;--bg2:#0d1630;--panel:rgba(14,22,42,.58);--line:rgba(148,163,184,.22);--text:#eef4ff;--muted:#9aa9c2;
-  --vus:#43e28b;--itsuki:#b98aff;--shadow:rgba(0,0,0,.4);--fx:#fff;
+  --vus:#43e28b;--ich:#b98aff;--shadow:rgba(0,0,0,.4);--fx:#fff;
   --ibg1:#140b2a;--ibg2:#2a1240;--g1:185,138,255;--g2:255,108,180;--ga:.24;
 }
 html[data-time="day"]{--ga:.36}
@@ -25,7 +25,7 @@ html[data-season="winter"]{--ibg1:#0c1a30;--ibg2:#18385a;--g1:150,200,255;--g2:2
 *{box-sizing:border-box}
 html{background:var(--bg1)}
 body{margin:0;min-height:100vh;color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg1)}
-/* Split background: VUS layer sits underneath; the Itsuki layer is masked on top (mask is moved by the mouse) */
+/* Split background: VUS layer sits underneath; the ICH layer is masked on top (mask is moved by the mouse) */
 .bg-vus,.bg-its{position:fixed;inset:0;z-index:0;pointer-events:none}
 .bg-vus{background:radial-gradient(900px 600px at 8% 0%,rgba(67,226,139,.18),transparent 60%),radial-gradient(800px 600px at 30% 105%,rgba(40,120,255,.22),transparent 62%),linear-gradient(165deg,#040a1a,#07173a 55%,#05132c)}
 .bg-vus canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
@@ -84,7 +84,7 @@ html[data-season="winter"] .d-dot{bottom:auto;top:-6px;box-shadow:0 0 6px var(--
 .fx-switch b{font-weight:600}
 .sw{position:relative;width:38px;height:22px;border-radius:20px;background:rgba(127,127,127,.3);transition:background .25s}
 .sw i{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .3s cubic-bezier(.16,1,.3,1)}
-.fx-switch[aria-checked="true"] .sw{background:linear-gradient(135deg,var(--vus),var(--itsuki))}
+.fx-switch[aria-checked="true"] .sw{background:linear-gradient(135deg,var(--vus),var(--ich))}
 .fx-switch[aria-checked="true"] .sw i{transform:translateX(16px)}
 .fx-ripple{position:fixed;z-index:900;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(var(--g1),.7),rgba(var(--g2),.45) 55%,transparent 72%);animation:fxRipple .95s cubic-bezier(.2,.7,.3,1) forwards}
 @keyframes fxRipple{0%{transform:scale(0);opacity:1}70%{opacity:.5}100%{transform:scale(70);opacity:0}}
@@ -106,7 +106,7 @@ h1{font-size:clamp(30px,5vw,46px);line-height:1.1;letter-spacing:-.04em;margin:9
   transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,border-color .35s}
 .site:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--accent) 55%,var(--line));
   box-shadow:0 26px 70px var(--shadow),0 0 0 1px color-mix(in srgb,var(--accent) 25%,transparent),inset 0 1px 0 rgba(255,255,255,.16)}
-.site.partner{--accent:var(--itsuki)}
+.site.partner{--accent:var(--ich)}
 .site-head{display:flex;align-items:center;gap:14px;margin-bottom:20px}
 .logo{width:58px;height:58px;flex:0 0 58px;border-radius:15px;object-fit:cover;background:#1b2438;border:1px solid var(--line);display:block}
 .logo-fallback{display:none;width:58px;height:58px;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:var(--accent);border-radius:15px;border:1px solid var(--line)}
@@ -131,8 +131,11 @@ button:active{transform:translateY(0) scale(.98)}
 .lg summary::-webkit-details-marker{display:none}
 .lg summary::after{content:"▾";color:var(--muted);transition:transform .2s}
 .lg[open] summary::after{transform:rotate(180deg)}
-.lg-list{display:grid;gap:6px;padding:0 10px 10px}
-.lg-list a{display:block;padding:9px 11px;border-radius:9px;color:var(--text);text-decoration:none;background:rgba(255,255,255,.06);border:1px solid transparent;transition:border-color .2s,transform .2s}
+.lg-list{display:grid;gap:6px;padding:0 10px 10px;max-height:158px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.lk{display:flex;gap:6px;align-items:stretch}
+.star{flex:0 0 auto;padding:0 11px;border-radius:9px;background:rgba(255,255,255,.06);color:var(--muted);font-size:15px;line-height:1}
+.star.on{color:#ffd76a}
+.lg-list a{display:block;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:9px 11px;border-radius:9px;color:var(--text);text-decoration:none;background:rgba(255,255,255,.06);border:1px solid transparent;transition:border-color .2s,transform .2s}
 .lg-list a:hover{border-color:var(--accent);transform:translateX(3px)}
 
 /* ---- Launch mode picker ---- */
@@ -144,7 +147,7 @@ button:active{transform:translateY(0) scale(.98)}
 .modal{--accent:var(--vus);position:relative;width:100%;max-width:620px;max-height:calc(100vh - 24px);overflow-y:auto;padding:24px 22px 18px;border-radius:24px;
   background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 14%,transparent),transparent 55%),color-mix(in srgb,var(--bg2) 94%,transparent);
   border:1px solid var(--line);box-shadow:0 30px 80px var(--shadow),inset 0 1px 0 rgba(255,255,255,.14);animation:popIn .4s cubic-bezier(.16,1,.3,1)}
-.modal.partner{--accent:var(--itsuki)}
+.modal.partner{--accent:var(--ich)}
 .m-x{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;padding:0;background:rgba(127,127,127,.15)}
 .m-top{text-align:center}
 .m-top .mi{width:48px;height:48px;margin:0 auto 10px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:24px;background:color-mix(in srgb,var(--accent) 20%,transparent);border:1px solid var(--line)}
@@ -199,7 +202,7 @@ button:active{transform:translateY(0) scale(.98)}
 <main>
 <header>
   <div class="eyebrow">Main Site for All Launchers</div>
-  <h1>VUS x Itsuki Launcher</h1>
+  <h1>VUS x ICH Launcher</h1>
 </header>
 <section class="grid" aria-label="Site launchers">
   <article class="site" id="vus-card">
@@ -217,19 +220,19 @@ button:active{transform:translateY(0) scale(.98)}
     <div class="link-groups" id="vus-links"></div>
   </article>
 
-  <article class="site partner" id="partner-card">
+  <article class="site partner" id="ich-card">
     <div class="site-head">
       <div>
-        <img class="logo" id="partner-logo" alt="Partner site icon" src="https://raw.githubusercontent.com/AniItsukiCoded/backups/main/icon.png">
-        <span class="logo-fallback" id="partner-fallback">A</span>
+        <img class="logo" id="ich-logo" alt="ICH logo" src="https://raw.githubusercontent.com/AniItsukiCoded/backups/main/icon.png">
+        <span class="logo-fallback" id="ich-fallback">I</span>
       </div>
-      <div><h2>Itsuki</h2><div class="sub">AniItsukiCoded</div></div>
+      <div><h2>ICH</h2><div class="sub">AniItsukiCoded</div></div>
     </div>
-    <h3>Launch Itsuki without link</h3>
+    <h3>Launch ICH without link</h3>
     <div class="actions">
-      <button class="primary">Launch Itsuki ↗</button>
+      <button class="primary">Launch ICH ↗</button>
     </div>
-    <div class="link-groups" id="partner-links"></div>
+    <div class="link-groups" id="ich-links"></div>
   </article>
 </section>
 </main>
@@ -265,7 +268,7 @@ button:active{transform:translateY(0) scale(.98)}
 
 <script>
 const VUS_URL = "https://raw.githubusercontent.com/Cra-Z-Gaming/VUS/main/index.html";
-const ITSUKI_URL = "https://raw.githubusercontent.com/AniItsukiCoded/backups/refs/heads/main/%28USE%29%20-%20Launcher%20Loader.html";
+const ICH_URL = "https://raw.githubusercontent.com/AniItsukiCoded/backups/refs/heads/main/%28USE%29%20-%20Launcher%20Loader.html";
 
 /* New-tab cover: this page shows behind the site, which loads on top after the delay (milliseconds). */
 const COVER_URL = "https://quizlet.com";
@@ -273,29 +276,12 @@ const NEW_TAB_DELAY = 6000;
 
 /* Add mirror URLs between the quotes below. Leave an entry as "" to hide it. */
 const VUS_MIRRORS = ["", "", ""];
-const ITSUKI_MIRRORS = ["", "", ""];
+const ICH_MIRRORS = ["", "", ""];
 
-/* Link dropdowns: each group is a dropdown, each link goes inside it. Edit freely.
-   An empty array [] hides that card's Links section. */
-const LINK_GROUPS = {
-  "vus-links": [
-    { name: "CodePen", links: [
-      { label: "CodePen link 1", url: "https://google.com" },
-      { label: "CodePen link 2", url: "https://google.com" },
-      { label: "CodePen link 3", url: "https://google.com" }
-    ]},
-    { name: "Group 2", links: [
-      { label: "Link 1", url: "https://google.com" },
-      { label: "Link 2", url: "https://google.com" }
-    ]}
-  ],
-  "partner-links": [
-    { name: "CodePen", links: [
-      { label: "CodePen link 1", url: "https://google.com" },
-      { label: "CodePen link 2", url: "https://google.com" }
-    ]}
-  ]
-};
+/* Link dropdowns live in their own plain text files, one per site, so each person only edits their own.
+   Use a file name next to this page, or a full URL (e.g. a raw.githubusercontent.com link from your own repo). */
+const VUS_LINKS_FILE = "links-vus.txt";
+const ICH_LINKS_FILE = "links-ich.txt";
 
 /* ---- Seasonal theme: time of day + season, with big decorations ---- */
 /* Force a season by typing its name: "halloween", "spring", "summer", "autumn" or "winter". Leave "" for automatic (by month). */
@@ -338,7 +324,6 @@ function setDeco(on) {
   const season = currentSeason(), c = SEASON_FX[season], d = document.getElementById("deco");
   clearTimeout(d._rm);
   document.getElementById("fxIcon").textContent = c.icon;
-  document.getElementById("fxLabel").textContent = c.label;
   document.getElementById("fxToggle").setAttribute("aria-checked", on);
   if (on) {
     root.dataset.season = season;
@@ -383,7 +368,7 @@ document.getElementById("fxToggle").addEventListener("click", () => {
   setTimeout(() => { setDeco(on); if (on) fxBurst(); }, 160);
   setTimeout(() => { fxBusy = false; }, 900);
 });
-/* ---- Split background: VUS (left, digit rain) / Itsuki (right, seasonal). Mouse position moves the blend. ---- */
+/* ---- Split background: VUS (left, digit rain) / ICH (right, seasonal). Mouse position moves the blend. ---- */
 const bgIts = document.getElementById("bgIts");
 let split = .5, splitTarget = .5, splitRaf = 0;
 function applySplit() {
@@ -405,7 +390,7 @@ function setSplit(v) {
   splitTarget = Math.max(.2, Math.min(.8, v));
   if (!splitRaf) splitRaf = requestAnimationFrame(splitStep);
 }
-/* mouse on the right -> Itsuki's side grows; mouse on the left -> VUS grows */
+/* mouse on the right -> ICH's side grows; mouse on the left -> VUS grows */
 window.addEventListener("pointermove", e => setSplit(.78 - (e.clientX / window.innerWidth) * .56), {passive:true});
 document.documentElement.addEventListener("mouseleave", () => setSplit(.5));
 applySplit();
@@ -590,32 +575,92 @@ function buildMirrors(cardId, mirrors) {
     mainActions.appendChild(button);
   });
 }
-function buildLinkGroups(hostId, groups) {
+/* Parses the simple links text file. [Name] or Name: starts a dropdown, every other line is a link. */
+function parseLinks(text) {
+  const groups = []; let cur = null;
+  for (const raw of text.split(/\r?\n/)) {
+    let line = raw.trim();
+    if (!line || line.startsWith("#")) continue;
+    const unq = line.replace(/^["'\u201c\u201d]+|["'\u201c\u201d]+$/g, "").trim();
+    if (/^\[?\/[^\/\s]+\]?$/.test(unq)) { cur = null; continue; }            /* optional closer: /Name or [/Name] */
+    let m = /^\[(.+)\]$/.exec(unq);
+    if (!m && /:\s*$/.test(line) && !/^https?:\/\//i.test(unq)) m = [0, unq.replace(/["'\u201c\u201d]*\s*:\s*$/, "").replace(/^["'\u201c\u201d]+/, "")];
+    if (m) { cur = {name: m[1].trim(), links: []}; groups.push(cur); continue; }
+    if (!cur) continue;
+    let label = "", url = unq;
+    if (unq.includes("|")) { const i = unq.indexOf("|"); label = unq.slice(0, i).trim(); url = unq.slice(i + 1).trim(); }
+    if (!/^https?:\/\//i.test(url) && /^[^\s\/]+\.[^\s]+$/.test(url)) url = "https://" + url;
+    if (!validUrl(url)) continue;
+    if (!label) { const u = new URL(url); label = (u.hostname.replace(/^www\./, "") + (u.pathname.length > 1 ? u.pathname : "")).slice(0, 48); }
+    cur.links.push({label, url});
+  }
+  return groups.filter(g => g.links.length);
+}
+async function loadLinks(hostId, file) {
   const host = document.getElementById(hostId);
-  if (!groups || !groups.length) { host.remove(); return; }
-  const title = document.createElement("h3");
-  title.textContent = "Links";
-  host.appendChild(title);
-  groups.forEach(g => {
-    const d = document.createElement("details");
-    d.className = "lg";
-    const s = document.createElement("summary");
-    s.textContent = g.name;
-    const list = document.createElement("div");
-    list.className = "lg-list";
-    g.links.filter(l => validUrl(l.url)).forEach(l => {
-      const a = document.createElement("a");
-      a.href = l.url; a.textContent = l.label;
-      a.target = "_blank"; a.rel = "noopener noreferrer";
-      list.appendChild(a);
+  let groups;
+  try {
+    const r = await fetch(file, {cache:"no-store"});
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    groups = parseLinks(await r.text());
+  } catch (err) {
+    const t = document.createElement("h3"); t.textContent = "Links";
+    const n = document.createElement("div"); n.className = "sub";
+    n.textContent = "Couldn't load " + file + " (" + err.message + "). Links need the page to be hosted, not opened as a local file.";
+    host.append(t, n);
+    return;
+  }
+  if (!groups.length) { host.remove(); return; }
+  const all = new Map();
+  groups.forEach(g => g.links.forEach(l => all.set(l.url, l)));
+  const favKey = "launcher.favs." + hostId;
+  let saved = [];
+  try { saved = JSON.parse(localStorage.getItem(favKey) || "[]"); } catch (_) {}
+  const favs = new Set(saved.filter(u => all.has(u)));
+  const saveFavs = () => { try { localStorage.setItem(favKey, JSON.stringify([...favs])); } catch (_) {} };
+
+  const title = document.createElement("h3"); title.textContent = "Links";
+  const favHost = document.createElement("div"), grpHost = document.createElement("div");
+  host.append(title, favHost, grpHost);
+
+  const setStar = b => { const on = favs.has(b.dataset.url); b.classList.toggle("on", on); b.textContent = on ? "\u2605" : "\u2606"; b.title = on ? "Remove from favorites" : "Add to favorites"; };
+  function toggleFav(url) {
+    if (favs.has(url)) favs.delete(url); else favs.add(url);
+    saveFavs();
+    grpHost.querySelectorAll(".star").forEach(b => { if (b.dataset.url === url) setStar(b); });
+    renderFavs();
+  }
+  function makeGroup(name, links) {
+    const d = document.createElement("details"); d.className = "lg";
+    const sm = document.createElement("summary"); sm.textContent = name;
+    const list = document.createElement("div"); list.className = "lg-list";
+    links.forEach(l => {
+      const row = document.createElement("div"); row.className = "lk";
+      const a = document.createElement("a"); a.href = l.url; a.textContent = l.label; a.target = "_blank"; a.rel = "noopener noreferrer";
+      const b = document.createElement("button"); b.type = "button"; b.className = "star"; b.dataset.url = l.url;
+      setStar(b); b.addEventListener("click", () => toggleFav(l.url));
+      row.append(a, b); list.appendChild(row);
     });
-    d.append(s, list);
-    /* only one dropdown open at a time per card */
-    d.addEventListener("toggle", () => {
-      if (d.open) host.querySelectorAll("details.lg[open]").forEach(o => { if (o !== d) o.open = false; });
-    });
-    host.appendChild(d);
-  });
+    d.append(sm, list);
+    return d;
+  }
+  let firstFavRender = true;
+  function renderFavs() {
+    const prev = favHost.querySelector("details");
+    const wasOpen = prev ? prev.open : false;
+    favHost.textContent = "";
+    if (!favs.size) return;
+    const d = makeGroup("\u2605 Favorites", [...favs].map(u => all.get(u)));
+    d.open = firstFavRender ? favs.size === 1 : wasOpen;   /* exactly 1 favorite -> starts expanded; 2+ -> collapsed */
+    firstFavRender = false;
+    favHost.appendChild(d);
+  }
+  groups.forEach(g => grpHost.appendChild(makeGroup(g.name, g.links)));
+  renderFavs();
+  /* only one dropdown open at a time per card */
+  host.addEventListener("toggle", e => {
+    if (e.target.open) host.querySelectorAll("details.lg[open]").forEach(o => { if (o !== e.target) o.open = false; });
+  }, true);
 }
 function setLogo(imgId, fallbackId, candidates) {
   const img = document.getElementById(imgId);
@@ -629,15 +674,16 @@ function setLogo(imgId, fallbackId, candidates) {
   img.src = candidates[index];
 }
 document.querySelector("#vus-card .actions .primary").addEventListener("click", () => chooseMode(VUS_URL, "VUS", false));
-document.querySelector("#partner-card .actions .primary").addEventListener("click", () => chooseMode(ITSUKI_URL, "Itsuki", true));
+document.querySelector("#ich-card .actions .primary").addEventListener("click", () => chooseMode(ICH_URL, "ICH", true));
 buildMirrors("vus-card", VUS_MIRRORS);
-buildMirrors("partner-card", ITSUKI_MIRRORS);
-Object.entries(LINK_GROUPS).forEach(([id, groups]) => buildLinkGroups(id, groups));
+buildMirrors("ich-card", ICH_MIRRORS);
+loadLinks("vus-links", VUS_LINKS_FILE);
+loadLinks("ich-links", ICH_LINKS_FILE);
 setLogo("vus-logo","vus-fallback",[
   "https://raw.githubusercontent.com/Cra-Z-Gaming/VUS/refs/heads/main/logo",
   "https://raw.githubusercontent.com/Cra-Z-Gaming/VUS/main/logo"
 ]);
-setLogo("partner-logo","partner-fallback",[
+setLogo("ich-logo","ich-fallback",[
   "https://raw.githubusercontent.com/AniItsukiCoded/backups/main/icon.png",
   "https://github.com/AniItsukiCoded/backups/raw/main/icon.png"
 ]);
