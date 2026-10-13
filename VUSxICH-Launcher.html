@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0b1020">
+<meta name="theme-color" content="#060b18">
 <title>VUS x Itsuki Launcher</title>
 <style>
 /* Dark UI everywhere. Left = VUS (blue/green), right = Itsuki (seasonal). Time of day only changes glow strength. */
@@ -91,6 +91,8 @@ html[data-season="winter"] .d-dot{bottom:auto;top:-6px;box-shadow:0 0 6px var(--
 .d-pop{position:fixed;top:var(--y);left:var(--x);z-index:950;font-size:26px;pointer-events:none;animation:dPop 1.6s ease-out forwards}
 @keyframes dPop{0%{opacity:1;transform:translate(0,0) scale(.6)}100%{opacity:0;transform:translate(var(--dx),-170px) scale(1.4) rotate(var(--r))}}
 @media(max-width:700px){.deco .d-x{display:none}.d-cor{width:90px;height:90px}.d-cor em{font-size:52px}.d-orb{top:9vh}.d-pk{font-size:26px}.fx-switch{top:10px;right:10px}}
+/* Respect "reduce motion" system setting: stop decoration animations */
+@media(prefers-reduced-motion:reduce){.deco *,.deco *::before,.deco *::after{animation:none!important}.d-fall,.d-rise,.d-dot{display:none}}
 
 main{position:relative;z-index:1;width:min(1050px,calc(100% - 32px));margin:auto;padding:42px 0 30px}
 header{text-align:center;margin-bottom:30px}
@@ -120,7 +122,20 @@ button:active{transform:translateY(0) scale(.98)}
 .primary:hover{filter:brightness(1.06)}
 .secondary{background:rgba(255,255,255,.06)}
 .version{position:relative;z-index:1;text-align:center;color:var(--muted);font-size:12px;letter-spacing:.04em;padding:6px 0 26px}
-/* ---- Launch mode picker (replaces the browser prompt) ---- */
+
+/* ---- Link dropdown groups ---- */
+.link-groups{margin-top:6px}
+.lg{margin-top:8px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.04);overflow:hidden;transition:border-color .2s}
+.lg[open]{border-color:color-mix(in srgb,var(--accent) 50%,var(--line))}
+.lg summary{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;font-weight:650;cursor:pointer;list-style:none}
+.lg summary::-webkit-details-marker{display:none}
+.lg summary::after{content:"▾";color:var(--muted);transition:transform .2s}
+.lg[open] summary::after{transform:rotate(180deg)}
+.lg-list{display:grid;gap:6px;padding:0 10px 10px}
+.lg-list a{display:block;padding:9px 11px;border-radius:9px;color:var(--text);text-decoration:none;background:rgba(255,255,255,.06);border:1px solid transparent;transition:border-color .2s,transform .2s}
+.lg-list a:hover{border-color:var(--accent);transform:translateX(3px)}
+
+/* ---- Launch mode picker ---- */
 .modal-bg{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(6,8,18,.62);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .modal-bg.show{display:flex;animation:fadeIn .25s ease}
 .modal-bg.closing{opacity:0;transition:opacity .2s}
@@ -175,7 +190,6 @@ button:active{transform:translateY(0) scale(.98)}
 @media(max-width:560px){.mode-grid{grid-template-columns:1fr;gap:18px}.pv{height:80px}}
 @media(max-height:640px){.pv,.m-top .mi,.mode-foot{display:none}}
 @media(max-width:720px){main{padding-top:28px}.grid{grid-template-columns:1fr}.site{padding:19px}}
-/* Decorations always animate; use the toggle (top right) to turn them off. */
 </style>
 </head>
 <body>
@@ -200,6 +214,7 @@ button:active{transform:translateY(0) scale(.98)}
     <div class="actions">
       <button class="primary">Launch VUS ↗</button>
     </div>
+    <div class="link-groups" id="vus-links"></div>
   </article>
 
   <article class="site partner" id="partner-card">
@@ -214,6 +229,7 @@ button:active{transform:translateY(0) scale(.98)}
     <div class="actions">
       <button class="primary">Launch Itsuki ↗</button>
     </div>
+    <div class="link-groups" id="partner-links"></div>
   </article>
 </section>
 </main>
@@ -236,8 +252,8 @@ button:active{transform:translateY(0) scale(.98)}
       <span class="mode-tag">Recommended</span>
       <div class="pv"><div class="pv-tabs"><span>Launcher</span><span class="on">about:blank</span></div><div class="pv-bar"><i></i><i></i><i></i><em></em></div><div class="pv-body"><div class="sb"></div><div class="ct"><s></s><s></s><s></s></div></div></div>
       <h3>New tab</h3>
-      <p>Opens in a separate tab. Quizlet shows behind it, and the site loads on top after 6 seconds.</p>
-      <div class="mode-pts"><span>New tab</span><span>6s delay</span><span>Popups needed</span></div>
+      <p>Opens the site in a separate tab so this launcher stays open.</p>
+      <div class="mode-pts"><span>New tab</span><span>Popups needed</span></div>
     </button>
   </div>
   <div class="mode-status" id="modeStatus" role="status" aria-live="polite"><span class="spin"></span><span id="modeStatusTxt">Loading…</span></div>
@@ -251,13 +267,31 @@ button:active{transform:translateY(0) scale(.98)}
 const VUS_URL = "https://raw.githubusercontent.com/Cra-Z-Gaming/VUS/main/index.html";
 const ITSUKI_URL = "https://raw.githubusercontent.com/AniItsukiCoded/backups/refs/heads/main/%28USE%29%20-%20Launcher%20Loader.html";
 
-/* New-tab cover: this page shows behind the site, which loads on top after the delay (milliseconds). */
-const COVER_URL = "https://quizlet.com";
-const NEW_TAB_DELAY = 6000;
-
 /* Add mirror URLs between the quotes below. Leave an entry as "" to hide it. */
 const VUS_MIRRORS = ["", "", ""];
 const ITSUKI_MIRRORS = ["", "", ""];
+
+/* Link dropdowns: each group is a dropdown, each link goes inside it. Edit freely.
+   An empty array [] hides that card's Links section. */
+const LINK_GROUPS = {
+  "vus-links": [
+    { name: "CodePen", links: [
+      { label: "CodePen link 1", url: "https://google.com" },
+      { label: "CodePen link 2", url: "https://google.com" },
+      { label: "CodePen link 3", url: "https://google.com" }
+    ]},
+    { name: "Group 2", links: [
+      { label: "Link 1", url: "https://google.com" },
+      { label: "Link 2", url: "https://google.com" }
+    ]}
+  ],
+  "partner-links": [
+    { name: "CodePen", links: [
+      { label: "CodePen link 1", url: "https://google.com" },
+      { label: "CodePen link 2", url: "https://google.com" }
+    ]}
+  ]
+};
 
 /* ---- Seasonal theme: time of day + season, with big decorations ---- */
 /* Force a season by typing its name: "halloween", "spring", "summer", "autumn" or "winter". Leave "" for automatic (by month). */
@@ -282,15 +316,9 @@ function currentSeason() {
   if (m === 8 || m === 10) return "autumn";
   return "winter";
 }
-function updateMeta() {
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (!meta) return;
-  meta.content = "#060b18";
-}
 function applyTime() {
   const h = new Date().getHours();
   root.dataset.time = h >= 6 && h < 17 ? "day" : h >= 17 && h < 20 ? "evening" : "night";
-  updateMeta();
 }
 function buildDeco(s) {
   const c = SEASON_FX[s], r = (a, b) => (a + Math.random() * (b - a)).toFixed(2), x = (i, n) => i >= n / 2 ? " d-x" : "";
@@ -319,7 +347,6 @@ function setDeco(on) {
     d._rm = setTimeout(() => { d.innerHTML = ""; }, 1000);
   }
   setRain(on);
-  updateMeta();
 }
 function fxWanted() { try { return localStorage.getItem(FX_KEY) !== "0"; } catch (_) { return true; } }
 function fxBurst() {
@@ -382,11 +409,13 @@ applySplit();
 /* Digit rain: one canvas, pre-drawn glyph sprites, ~30 fps, only columns on the visible (VUS) side are drawn.
    Every digit flips 0<->1 on its own random timer and every column has its own speed, so nothing is in sync. */
 const CELL = 22;
+const DPR = Math.min(window.devicePixelRatio || 1, 2);
 const rainCv = document.getElementById("rain"), rctx = rainCv.getContext("2d");
 function mkSprite(ch, color, glow) {
   const c = document.createElement("canvas");
-  c.width = CELL; c.height = CELL;
+  c.width = CELL * DPR; c.height = CELL * DPR;
   const x = c.getContext("2d");
+  x.scale(DPR, DPR);
   x.font = "700 17px ui-monospace,Menlo,Consolas,monospace";
   x.textAlign = "center"; x.textBaseline = "middle";
   if (glow) { x.shadowColor = "#43e28b"; x.shadowBlur = 8; }
@@ -417,7 +446,7 @@ function drawCol(c, t) {
     const i = ((c.h - k) % c.L + c.L) % c.L;
     if (t > c.f[i]) { c.d[i] ^= 1; c.f[i] = t + 300 + Math.random() * 2000; }
     rctx.globalAlpha = (k === 0 ? 1 : Math.pow(1 - k / c.L, 1.5) * .72) * c.a;
-    rctx.drawImage(SPR[k === 0 ? 1 : 0][c.d[i]], c.x, r * CELL);
+    rctx.drawImage(SPR[k === 0 ? 1 : 0][c.d[i]], c.x, r * CELL, CELL, CELL);
   }
 }
 let perfFrames = 0, perfStart = 0, lowRuns = 0, lite = false;
@@ -446,7 +475,8 @@ function rainFrame(t) {
 }
 function sizeRain() {
   W = window.innerWidth; H = window.innerHeight;
-  rainCv.width = W; rainCv.height = H;
+  rainCv.width = W * DPR; rainCv.height = H * DPR;
+  rctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   ROWS = Math.ceil(H / CELL);
   const t = performance.now();
   rainCols = [];
@@ -468,7 +498,7 @@ setInterval(applyTime, 5 * 60 * 1000);
 /* ---- Launcher logic ---- */
 function validUrl(value) {
   try {
-    const u = new URL(value.trim());
+    const u = new URL(String(value).trim());
     return u.protocol === "https:" || u.protocol === "http:";
   } catch (_) { return false; }
 }
@@ -510,10 +540,9 @@ async function launch(url, mode) {
   if (mode === "new") {
     closeModal();
     target.document.open();
-    target.document.write('<!doctype html><title>Quizlet</title><body style="margin:0;background:#fff;overflow:hidden"><iframe src="' + COVER_URL + '" style="position:fixed;inset:0;width:100%;height:100%;border:0;background:#fff"></iframe></body>');
+    target.document.write('<!doctype html><title>Loading…</title><body style="margin:0;background:#0b1020;color:#9aa9c2;font:16px system-ui;display:flex;align-items:center;justify-content:center;height:100vh">Loading…</body>');
     target.document.close();
   }
-  const started = Date.now();
   if (mode === "same") setStatus("load", "Loading site from GitHub…");
   try {
     const response = await fetch(url, {cache:"no-store"});
@@ -521,7 +550,6 @@ async function launch(url, mode) {
     const html = await response.text();
     if (!/<html[\s>]/i.test(html)) throw new Error("The response does not look like an HTML page.");
     if (mode === "new") {
-      await new Promise(r => setTimeout(r, Math.max(0, NEW_TAB_DELAY - (Date.now() - started))));
       if (target.closed) return;
       const f = target.document.createElement("iframe");
       f.setAttribute("allow", "fullscreen; clipboard-read; clipboard-write; autoplay; microphone; camera; geolocation; encrypted-media; picture-in-picture");
@@ -556,6 +584,33 @@ function buildMirrors(cardId, mirrors) {
     mainActions.appendChild(button);
   });
 }
+function buildLinkGroups(hostId, groups) {
+  const host = document.getElementById(hostId);
+  if (!groups || !groups.length) { host.remove(); return; }
+  const title = document.createElement("h3");
+  title.textContent = "Links";
+  host.appendChild(title);
+  groups.forEach(g => {
+    const d = document.createElement("details");
+    d.className = "lg";
+    const s = document.createElement("summary");
+    s.textContent = g.name;
+    const list = document.createElement("div");
+    list.className = "lg-list";
+    g.links.filter(l => validUrl(l.url)).forEach(l => {
+      const a = document.createElement("a");
+      a.href = l.url; a.textContent = l.label;
+      a.target = "_blank"; a.rel = "noopener noreferrer";
+      list.appendChild(a);
+    });
+    d.append(s, list);
+    /* only one dropdown open at a time per card */
+    d.addEventListener("toggle", () => {
+      if (d.open) host.querySelectorAll("details.lg[open]").forEach(o => { if (o !== d) o.open = false; });
+    });
+    host.appendChild(d);
+  });
+}
 function setLogo(imgId, fallbackId, candidates) {
   const img = document.getElementById(imgId);
   const fallback = document.getElementById(fallbackId);
@@ -571,13 +626,14 @@ document.querySelector("#vus-card .actions .primary").addEventListener("click", 
 document.querySelector("#partner-card .actions .primary").addEventListener("click", () => chooseMode(ITSUKI_URL, "Itsuki", true));
 buildMirrors("vus-card", VUS_MIRRORS);
 buildMirrors("partner-card", ITSUKI_MIRRORS);
+Object.entries(LINK_GROUPS).forEach(([id, groups]) => buildLinkGroups(id, groups));
 setLogo("vus-logo","vus-fallback",[
   "https://raw.githubusercontent.com/Cra-Z-Gaming/VUS/refs/heads/main/logo",
-  "https://github.com/Cra-Z-Gaming/VUS/blob/main/logo"
+  "https://raw.githubusercontent.com/Cra-Z-Gaming/VUS/main/logo"
 ]);
 setLogo("partner-logo","partner-fallback",[
   "https://raw.githubusercontent.com/AniItsukiCoded/backups/main/icon.png",
-  "https://github.com/AniItsukiCoded/backups/blob/main/icon.png"
+  "https://github.com/AniItsukiCoded/backups/raw/main/icon.png"
 ]);
 </script>
 </body>
