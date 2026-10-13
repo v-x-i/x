@@ -107,13 +107,18 @@ h1{font-size:clamp(30px,5vw,46px);line-height:1.1;letter-spacing:-.04em;margin:9
 .site:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--accent) 55%,var(--line));
   box-shadow:0 26px 70px var(--shadow),0 0 0 1px color-mix(in srgb,var(--accent) 25%,transparent),inset 0 1px 0 rgba(255,255,255,.16)}
 .site.partner{--accent:var(--ich)}
-.site-head{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.site-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;margin-bottom:6px}
+.site-head>div:first-child{display:flex;justify-content:center}
+.site h3{text-align:center}
+.brand{display:block;width:84px;height:84px;margin:0 auto 16px;border-radius:22px;object-fit:cover;background:#1b2438;border:1px solid var(--line);box-shadow:0 10px 30px var(--shadow)}
+.link-ver{margin-top:12px;text-align:center;font-size:12px;letter-spacing:.03em;color:var(--muted)}
 .logo{width:58px;height:58px;flex:0 0 58px;border-radius:15px;object-fit:cover;background:#1b2438;border:1px solid var(--line);display:block}
 .logo-fallback{display:none;width:58px;height:58px;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:var(--accent);border-radius:15px;border:1px solid var(--line)}
 h2{font-size:23px;margin:0;letter-spacing:-.025em}
 .sub{color:var(--muted);font-size:13px;margin-top:3px}
 h3{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:21px 0 9px}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.actions{display:flex;flex-wrap:wrap;justify-content:center;gap:9px}
+.actions button{flex:0 1 240px;min-width:150px}
 button{font:inherit;font-weight:650;color:inherit;cursor:pointer;border:1px solid var(--line);border-radius:11px;padding:11px 12px;text-align:center;
   transition:transform .2s,border-color .2s,background .2s,box-shadow .2s,filter .2s}
 button:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 8px 22px color-mix(in srgb,var(--accent) 28%,transparent)}
@@ -135,7 +140,7 @@ button:active{transform:translateY(0) scale(.98)}
 .lk{display:flex;gap:6px;align-items:stretch}
 .star{flex:0 0 auto;padding:0 11px;border-radius:9px;background:rgba(255,255,255,.06);color:var(--muted);font-size:15px;line-height:1}
 .star.on{color:#ffd76a}
-.lg-list a{display:block;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:9px 11px;border-radius:9px;color:var(--text);text-decoration:none;background:rgba(255,255,255,.06);border:1px solid transparent;transition:border-color .2s,transform .2s}
+.lg-list a{display:block;text-align:center;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:9px 11px;border-radius:9px;color:var(--text);text-decoration:none;background:rgba(255,255,255,.06);border:1px solid transparent;transition:border-color .2s,transform .2s}
 .lg-list a:hover{border-color:var(--accent);transform:translateX(3px)}
 
 /* ---- Launch mode picker ---- */
@@ -201,6 +206,7 @@ button:active{transform:translateY(0) scale(.98)}
 <button class="fx-switch" id="fxToggle" type="button" role="switch" aria-checked="true" title="Seasonal theme"><span id="fxIcon">🎃</span><b id="fxLabel">Seasonal</b><em class="sw"><i></i></em></button>
 <main>
 <header>
+  <img class="brand" id="brand-logo" alt="VUS x ICH logo" src="https://raw.githubusercontent.com/v-x-i/x/refs/heads/main/Logo.jpg">
   <div class="eyebrow">Main Site for All Launchers</div>
   <h1>VUS x ICH Launcher</h1>
 </header>
@@ -264,7 +270,7 @@ button:active{transform:translateY(0) scale(.98)}
 </div></div>
 
 <!-- EDIT THIS LINE by hand each time you update the launcher on GitHub -->
-<div class="version" id="version">Version October, 13, 2026 - 6:02 PM</div>
+<div class="version" id="version">Version October, 12, 2026 - 2:03 PM</div>
 
 <script>
 const VUS_URL = "https://raw.githubusercontent.com/Cra-Z-Gaming/VUS/main/index.html";
@@ -577,11 +583,13 @@ function buildMirrors(cardId, mirrors) {
 }
 /* Parses the simple links text file. [Name] or Name: starts a dropdown, every other line is a link. */
 function parseLinks(text) {
-  const groups = []; let cur = null;
+  const groups = []; let cur = null, version = "";
   for (const raw of text.split(/\r?\n/)) {
     let line = raw.trim();
     if (!line || line.startsWith("#")) continue;
     const unq = line.replace(/^["'\u201c\u201d]+|["'\u201c\u201d]+$/g, "").trim();
+    const vm = /^version\s*[:=]\s*(.+)$/i.exec(unq);
+    if (vm) { version = vm[1].trim(); continue; }                           /* e.g.  Version: October 14, 2026 - 3:00 PM */
     if (/^\[?\/[^\/\s]+\]?$/.test(unq)) { cur = null; continue; }            /* optional closer: /Name or [/Name] */
     const md = /^\[(.+?)\]\((\S+?)\)$/.exec(unq);
     if (md && cur) { if (validUrl(md[2])) cur.links.push({label: md[1].trim(), url: md[2]}); continue; }
@@ -596,15 +604,16 @@ function parseLinks(text) {
     if (!label) label = "Link " + (cur.links.length + 1);
     cur.links.push({label, url});
   }
-  return groups.filter(g => g.links.length);
+  return {groups: groups.filter(g => g.links.length), version};
 }
 async function loadLinks(hostId, file) {
   const host = document.getElementById(hostId);
-  let groups;
+  let groups, version = "";
   try {
     const r = await fetch(file, {cache:"no-store"});
     if (!r.ok) throw new Error("HTTP " + r.status);
-    groups = parseLinks(await r.text());
+    const parsed = parseLinks(await r.text());
+    groups = parsed.groups; version = parsed.version;
   } catch (err) {
     console.warn("Links not loaded:", file, err.message);   /* silent on the page; details only in the console */
     host.remove();
@@ -657,6 +666,9 @@ async function loadLinks(hostId, file) {
   }
   groups.forEach(g => grpHost.appendChild(makeGroup(g.name, g.links)));
   renderFavs();
+  const ver = document.createElement("div"); ver.className = "link-ver";
+  ver.textContent = (version ? "Links " + version + " \u00b7 " : "") + all.size + " link" + (all.size === 1 ? "" : "s");
+  host.appendChild(ver);
   /* only one dropdown open at a time per card */
   host.addEventListener("toggle", e => {
     if (e.target.open) host.querySelectorAll("details.lg[open]").forEach(o => { if (o !== e.target) o.open = false; });
@@ -669,10 +681,15 @@ function setLogo(imgId, fallbackId, candidates) {
   img.onerror = () => {
     index++;
     if (index < candidates.length) img.src = candidates[index];
-    else { img.style.display = "none"; fallback.style.display = "flex"; }
+    else { img.style.display = "none"; if (fallback) fallback.style.display = "flex"; }
   };
   img.src = candidates[index];
 }
+setLogo("brand-logo", null, [
+  "https://raw.githubusercontent.com/v-x-i/x/refs/heads/main/Logo.jpg",
+  "https://raw.githubusercontent.com/v-x-i/x/main/Logo.jpg",
+  "https://github.com/v-x-i/x/raw/main/Logo.jpg"
+]);
 document.querySelector("#vus-card .actions .primary").addEventListener("click", () => chooseMode(VUS_URL, "VUS", false));
 document.querySelector("#ich-card .actions .primary").addEventListener("click", () => chooseMode(ICH_URL, "ICH", true));
 buildMirrors("vus-card", VUS_MIRRORS);
