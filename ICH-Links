@@ -1,9 +1,25 @@
-# ICH links.  [Name] starts a dropdown, then one link per line. That's it.
-# Lines starting with # are notes. Groups with no links stay hidden.
-# Want a custom label?  My Label | https://link.com
-
-[CodePen]
-https://google.com
-google.com/search?q=two
+# ICH links.  [Name] starts a dropdown, then paste one link per line. That's it.
+# Lines starting with # are notes. Dropdowns with no links stay hidden.
+# Links are numbered automatically (Link 1, Link 2...). Want a name? My Label | https://link.com
 
 [Canva]
+https://sukischathub-launcher.my.canva.site/ich-launcher-backup-1
+https://sukischathub-launcher.my.canva.site/
+https://itsukischathub.my.canva.site/
+https://1143.my.canva.site/
+https://itsukis-chat-hub-by-jace.my.canva.site/
+
+[Google Sites]
+https://sites.google.com/view/itsukis-chat-hub/main
+https://sites.google.com/view/itsukis-chat-hub-launcher/home_1
+https://sites.google.com/view/ich-launcher/home
+
+[Vercel]
+https://itsukis-chat-hub.vercel.app/
+https://ich-launcher.vercel.app/
+https://ich-by-suki.vercel.app/
+
+[p5js]
+https://editor.p5js.org/jace01b/sketches/mYFtQwQgD
+https://editor.p5js.org/jace01b/full/WUTqx4Upg
+https://editor.p5js.org/jace01b/full/1prpxaC-R
